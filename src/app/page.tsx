@@ -1,13 +1,23 @@
 "use client";
 import styles from './page.module.css';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+
+export interface ITodo {
+  _id?: string;
+  name: string;
+  description: string;
+  duedate: string;
+  status: boolean;
+}
+
 
 export default function Home() {
-  const [todos, setTodos] = useState([]);
+  const [todos, setTodos] = useState<ITodo[]>([]);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [duedate, setDuedate] = useState('');
   const [status, setStatus] = useState(false);
+
 
   const handleAddTodo = () => {
     if (name.trim() === '' || description.trim() === '' || duedate.trim() === '') return;
@@ -16,19 +26,92 @@ export default function Home() {
     setDescription('');
     setDuedate('');
     setStatus(false);
+
+    fetch('/api/v1/todo', {
+      method: 'POST',
+      body: JSON.stringify({
+        name,
+        description,
+        status,
+        duedate
+      })
+    }).then(res=>res.json()).then(data=>{
+      console.log(data);
+    }).catch(err=>{
+      console.log(err);
+    })
   };
 
-  const toggleTodo = (index) => {
-    const newTodos = todos.map((todo, i) =>
+
+  const toggleTodo = (index: number) => {
+    const todoToToggle = todos[index];
+
+    if (!todoToToggle._id) return;
+
+    // Optimistically update the status in the frontend
+    const updatedTodos = todos.map((todo, i) =>
       i === index ? { ...todo, status: !todo.status } : todo
     );
-    setTodos(newTodos);
-  };
+    setTodos(updatedTodos);
+  
+    // Send the PUT request to update the status in the backend
+    fetch('/api/v1/todo', {
+      method: 'PUT',
+      body: JSON.stringify({
+        id: todoToToggle._id, // Use the _id to identify the todo
+        status: !todoToToggle.status, // Toggle the current status
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    };
 
-  const handleDeleteTodo = (index) => {
+
+
+  const handleDeleteTodo = (index: number) => {
+    const todoToDelete = todos.at(index);
+    if (!todoToDelete || !todoToDelete._id) return;
+
     const newTodos = todos.filter((_, i) => i !== index);
     setTodos(newTodos);
-  };
+
+    fetch('/api/v1/todo', {
+      method: 'DELETE',
+      body: JSON.stringify({
+        id: todoToDelete._id, 
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    };
+
+
+
+  useEffect(()=>{
+    fetch('/api/v1/todo', {
+      method: 'GET'
+    }).then(res=>res.json()).then(data=>{
+      const todos = data.data;
+      setTodos(todos);
+    })
+  }, [])
+
 
   return (
     <div className={styles.page}>
