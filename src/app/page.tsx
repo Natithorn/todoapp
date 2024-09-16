@@ -19,6 +19,7 @@ export default function Home() {
   const [status, setStatus] = useState(false);
 
 
+  // Add //
   const handleAddTodo = () => {
     if (name.trim() === '' || description.trim() === '' || duedate.trim() === '') return;
     setTodos([...todos, { name, description, duedate, status }]);
@@ -42,24 +43,20 @@ export default function Home() {
     })
   };
 
-
+// Status ✔ : ✘ //
   const toggleTodo = (index: number) => {
     const todoToToggle = todos[index];
-
     if (!todoToToggle._id) return;
-
-    // Optimistically update the status in the frontend
     const updatedTodos = todos.map((todo, i) =>
       i === index ? { ...todo, status: !todo.status } : todo
     );
     setTodos(updatedTodos);
   
-    // Send the PUT request to update the status in the backend
     fetch('/api/v1/todo', {
       method: 'PUT',
       body: JSON.stringify({
-        id: todoToToggle._id, // Use the _id to identify the todo
-        status: !todoToToggle.status, // Toggle the current status
+        id: todoToToggle._id, 
+        status: !todoToToggle.status, 
       }),
       headers: {
         'Content-Type': 'application/json',
@@ -74,6 +71,8 @@ export default function Home() {
       });
     };
 
+    
+// DELETE //
   const handleDeleteTodo = (index: number) => {
     const todoToDelete = todos.at(index);
     if (!todoToDelete || !todoToDelete._id) return;

@@ -71,7 +71,7 @@ export async function DELETE(req: NextRequest) {
   }
 }
 
-// Update Stutus  //
+// Update Status  //
 export async function PUT(req: NextRequest) {
   const { id, status } = await req.json();
 
