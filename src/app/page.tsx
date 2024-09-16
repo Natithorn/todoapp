@@ -74,8 +74,6 @@ export default function Home() {
       });
     };
 
-
-
   const handleDeleteTodo = (index: number) => {
     const todoToDelete = todos.at(index);
     if (!todoToDelete || !todoToDelete._id) return;
