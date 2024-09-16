@@ -47,6 +47,7 @@ export default function Home() {
   const toggleTodo = (index: number) => {
     const todoToToggle = todos[index];
     if (!todoToToggle._id) return;
+    
     const updatedTodos = todos.map((todo, i) =>
       i === index ? { ...todo, status: !todo.status } : todo
     );
@@ -71,7 +72,7 @@ export default function Home() {
       });
     };
 
-    
+
 // DELETE //
   const handleDeleteTodo = (index: number) => {
     const todoToDelete = todos.at(index);
@@ -97,7 +98,6 @@ export default function Home() {
         console.log(err);
       });
     };
-
 
 
   useEffect(()=>{
@@ -130,7 +130,7 @@ export default function Home() {
             placeholder="Description"
           />
           <input
-            type="text"
+            type="datetime-local"
             className={styles['todo-input']}
             value={duedate}
             onChange={(e) => setDuedate(e.target.value)}
@@ -146,7 +146,13 @@ export default function Home() {
               key={index}
               className={styles['todo-item']}
             >
-              <div className={styles['todo-item-content']}>
+              <div
+                className={styles['todo-item-content']}
+                style={{
+                  textDecoration: todo.status ? 'line-through' : 'none',
+                  color: todo.status ? 'gray' : 'black',
+                }}
+              >
                 <div className={styles['todo-item-header']}>
                   <strong>{todo.name}</strong>
                 </div>
